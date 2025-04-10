@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 #SRP: Clase solo representa el estado del sistema
 class ArgenTour:
     def __init__(self, sistema_activo):
-        self.sistema_activo = sistema_activo
+        self.sistema_activo = sistema_activo   #hola :lea
 
 class Servicio:
     def __init__(self, unidad, fecha_partida:datetime.date, fecha_llegada:datetime.date, calidad, precio):
