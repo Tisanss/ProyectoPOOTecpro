@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 #SRP: Clase solo representa el estado del sistema
 class ArgenTour:
     def __init__(self, sistema_activo):
-        self.sistema_activo = sistema_activo   
+        self.sistema_activo = sistema_activo  
 
 class Servicio:
     def __init__(self, unidad, fecha_partida:datetime.date, fecha_llegada:datetime.date, calidad, precio):
@@ -40,15 +40,32 @@ class Asiento:
         self.ocupado = ocupado
 
 class Itinerario:
-    def __init__(self):
-        pass
+    def __init__(self, origen, destino, paradas = []):
+        self.origen = origen
+        self.destino = destino
+        self.paradas = paradas #Es una lista de ciudad (de los objetos), puede tener varias paradas antes de llegar al destino
+
+    def mostrar_itinerario(self):
+        if self.paradas and len(self.paradas) > 0:
+            nombres_paradas = []
+            for parada in self.paradas:
+                nombres_paradas.append(nombres_paradas)
+            paradas_str = ", ".join(nombres_paradas) #es una linea de strings que separa las paradas con una ","
+        else:
+            paradas_str = "Sin paradas"
+        origen_str = f"Origen: {self.origen.nombre}"
+        destino_str = f"Destino: {self.origen.destino}"
+        resultado = f"{origen_str}, {destino_str}, Paradas: {paradas_str}"
+        return resultado
+    
 
 class Ciudad:
     def __init__(self, codigo, nombre, provincia):
         self.codigo = codigo
         self.nombre = nombre 
         self.provincia = provincia
-
+        
+        
 #Una interfez, X metodos, redefine, los usan las clases hijas
 class MedioPago (ABC):
     #Clase interfaz no lleva init (en ese caso definiria comportamiento en una clase abstracta)
@@ -98,6 +115,7 @@ class TarjetaCredito(MedioPago):
     
     def enviar_comprobante(self): #enviarlo a la pagina del banco? que el usuario lo vea en homebanking 
         ...
+
     
 
 
@@ -116,6 +134,15 @@ if __name__ == "__main__":
     tarjetacredito1 = TarjetaCredito("84545231",44843333,"Juancito",datetime.date(2025,10,10))
     servicio1 = Servicio(unidad1,datetime.date(2025,5,6),datetime.date(2025,6,3),"Premium",50000)
 
-        
-        
+#para hacer un commit:
+# guardalo
+# abri tu ruta de carpeta en el cmd
+# git add Sistema.py
+# git commit -m "mensaje aclarando q hiciste"
+# git push        
+
+#para guardar un commit:
+# git stash
+# git pull
+# git stash pop 
         
