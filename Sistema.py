@@ -1,6 +1,5 @@
 import datetime 
-from abc import ABC, abstractcmethod
-
+from abc import ABC, abstractmethod
 class ArgenTour:
     def __init__(self, sistema_activo):
         self.sistema_activo = sistema_activo
@@ -12,6 +11,9 @@ class Servicio:
         self.fecha_llegada = fecha_llegada
         self.calidad = calidad
         self.precio = precio
+    def consultar_servicios_disponibles(self):
+        print("Servivios disponibles:\n")
+        
 
 class Venta:
     def __init__(self, fecha_hora):
@@ -49,7 +51,7 @@ class Ciudad:
         self.provincia = provincia
 #Una interfez, X metodos, redefine, los usan las clases hijas
 class MedioPago (ABC):
-    @abstractcmethod   
+    @abstractmethod   
     def __init__(self):
         pass
     def procesar_pago(self, monto):
@@ -89,8 +91,9 @@ if __name__ == "__main__":
     venta1 = Venta(datetime.time(14,30,00))
     unidad1 = Unidad("123 ABC")
     pasajero1 = Pasajero("Martin","martinelmascrack777@gmail.com",36566999)
-    reserva1 = Reserva(pasajero1,datetime.time(15,45,00))
     asiento1 = Asiento(44,True)
+    reserva1 = Reserva(pasajero1,datetime.time(15,45,00),asiento1)
+    
     #falta declarar itinerario
     ciudad1 = Ciudad("3100","Parana","Entre rios")
     #falta declarar medio_pago
