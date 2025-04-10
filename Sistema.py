@@ -1,6 +1,7 @@
 import datetime 
-from abc import ABC, abstractcmethod
+from abc import ABC, abstractmethod
 
+#SRP: Clase solo representa el estado del sistema
 class ArgenTour:
     def __init__(self, sistema_activo):
         self.sistema_activo = sistema_activo
@@ -49,7 +50,7 @@ class Ciudad:
         self.provincia = provincia
 #Una interfez, X metodos, redefine, los usan las clases hijas
 class MedioPago (ABC):
-    @abstractcmethod   
+    @abstractmethod   
     def __init__(self):
         pass
     def procesar_pago(self, monto):
