@@ -43,6 +43,16 @@ class Reserva:
 class Unidad:
     def __init__(self, patente):
         self.patente = patente
+        self.asientos = []
+        for x in range(5):
+            self.asientos.append(Asiento(x+1,False)) #x+1 para que la lista de asientos no arranque de 0 (muero croto)
+            
+    def mostrar_asientos(self):
+        for a in self.asientos:
+            print(a.numero," ")
+            
+        
+        
 
 class Asiento:
     def __init__(self, numero, ocupado):
@@ -152,8 +162,18 @@ if __name__ == "__main__":
     servicios = [servicio1, servicio2]
     
     print("Servicios disponibles: ")
+    counter = 1
     for s in servicios:
+        print("Servicio ",counter,":")
         print(s.mostrar_infoservicio())
+        counter+= 1
+        
+    servicio_seleccionado = int(input("¿Qué servicio desea seleccionar?")) 
+    print("Asientos disponibles: [")
+    servicios[servicio_seleccionado].unidad.mostrar_asientos()
+    print("]")
+    
+    
     
 #para hacer un commit:
 # guardalo
