@@ -7,15 +7,22 @@ class ArgenTour:
         self.sistema_activo = sistema_activo  
 
 class Servicio:
-    def __init__(self, unidad, fecha_partida:datetime.date, fecha_llegada:datetime.date, calidad, precio):
+    def __init__(self, unidad, fecha_partida:datetime.date, fecha_llegada:datetime.date, calidad, precio, itinerario):
         self.unidad = unidad
         self.fecha_partida = fecha_partida
         self.fecha_llegada = fecha_llegada
         self.calidad = calidad
         self.precio = precio
-    def consultar_servicios_disponibles(self):
-        print("Servivios disponibles:\n")
-        
+        self.itinerario = itinerario
+    def mostrar_infoservicio(self):
+        return{
+            f"{self.itinerario.mostrar_itinerario()}\n"
+            f"Calidad: {self.calidad}, "
+            f"Salida: {self.fecha_partida},"
+            f"Llegada: {self.fecha_llegada},"
+            f"Precio: ${self.precio}"
+        }
+
 
 class Venta:
     def __init__(self, fecha_hora):
@@ -36,6 +43,16 @@ class Reserva:
 class Unidad:
     def __init__(self, patente):
         self.patente = patente
+        self.asientos = []
+        for x in range(5):
+            self.asientos.append(Asiento(x+1,False)) #x+1 para que la lista de asientos no arranque de 0 (muero croto)
+            
+    def mostrar_asientos(self):
+        for a in self.asientos:
+            print(a.numero," ")
+            
+        
+        
 
 class Asiento:
     def __init__(self, numero, ocupado):
@@ -52,12 +69,12 @@ class Itinerario:
         if self.paradas and len(self.paradas) > 0:
             nombres_paradas = []
             for parada in self.paradas:
-                nombres_paradas.append(nombres_paradas)
+                nombres_paradas.append(parada.nombre)
             paradas_str = ", ".join(nombres_paradas) #es una linea de strings que separa las paradas con una ","
         else:
             paradas_str = "Sin paradas"
         origen_str = f"Origen: {self.origen.nombre}"
-        destino_str = f"Destino: {self.origen.destino}"
+        destino_str = f"Destino: {self.destino.nombre}"
         resultado = f"{origen_str}, {destino_str}, Paradas: {paradas_str}"
         return resultado
     
@@ -118,26 +135,46 @@ class TarjetaCredito(MedioPago):
     
     def enviar_comprobante(self): #enviarlo a la pagina del banco? que el usuario lo vea en homebanking 
         ...
-
     
-
 
 if __name__ == "__main__":
 
     argentour1 = ArgenTour(True)
     venta1 = Venta(datetime.time(14,30,00))
-    unidad1 = Unidad("123 ABC")
-    pasajero1 = Pasajero("Martin","martinelmascrack777@gmail.com",36566999)
-    asiento1 = Asiento(44,True)
-    reserva1 = Reserva(pasajero1,datetime.time(15,45,00),asiento1)
     
+    pasajero1 = Pasajero("Martin","martinelmascrack777@gmail.com",36566999)
+    reserva1 = Reserva(pasajero1,datetime.time(15,45,00),44)
+    asiento1 = Asiento(44,True)
     #falta declarar itinerario
     ciudad1 = Ciudad("3100","Parana","Entre rios")
     #falta declarar medio_pago
     mercadopago1 = MercadoPago("44542631","pedritopepito@gmail.com")
     tarjetacredito1 = TarjetaCredito("84545231",44843333,"Juancito",datetime.date(2025,10,10))
-    servicio1 = Servicio(unidad1,datetime.date(2025,5,6),datetime.date(2025,6,3),"Premium",50000)
 
+    ciudad_origen = Ciudad("1000","Buenos Aires","Buenos Aires")
+    ciudad_destino = Ciudad("3100", "Paraná", "Entre Ríos")
+    ciudad_parada = Ciudad("3000","Santa Fe","Santa Fe")
+
+    itinerario1 = Itinerario(ciudad_origen,ciudad_destino, [ciudad_parada])
+    unidad1 = Unidad("123 ABC")
+    servicio1 = Servicio(unidad1,datetime.date(2025,5,6),datetime.date(2025,6,3),"Premium",50000,itinerario1)
+    servicio2 = Servicio(unidad1, datetime.date(2025,5,10),datetime.date(2025,5,11),"Comun",40000,itinerario1)
+    servicios = [servicio1, servicio2]
+    
+    print("Servicios disponibles: ")
+    counter = 1
+    for s in servicios:
+        print("Servicio ",counter,":")
+        print(s.mostrar_infoservicio())
+        counter+= 1
+        
+    servicio_seleccionado = int(input("¿Qué servicio desea seleccionar?")) 
+    print("Asientos disponibles: [")
+    servicios[servicio_seleccionado].unidad.mostrar_asientos()
+    print("]")
+    
+    
+    
 #para hacer un commit:
 # guardalo
 # abri tu ruta de carpeta en el cmd
