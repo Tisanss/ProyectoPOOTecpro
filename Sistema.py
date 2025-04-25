@@ -53,13 +53,18 @@ class Unidad:
         self.patente = patente
         self.asientos = []
         for x in range(5):
-            self.asientos.append(Asiento(x+1,False)) #x+1 para que la lista de asientos no arranque de 0 (muero croto)
+            self.asientos.append(Asiento(x+1,False)) #x+1 para que la lista de asientos no arranque de 0 
             
-    def mostrar_asientos(self, estado:bool): # Booleano para determinar si mostrar asientos ocupados o libres
+    def asientos_disponibles(self): 
+        L = []
         for a in self.asientos:
-            if a.ocupado == estado:
-                print(a.numero, end = ", ")
+            if not a.is_ocupado() :
+                L.append(a.get_numero())
     
+        return L
+    
+                
+                
         
         
 
@@ -67,6 +72,12 @@ class Asiento:
     def __init__(self, numero, ocupado):
         self.numero = numero 
         self.ocupado = ocupado
+        
+    def is_ocupado(self) -> bool :
+        return self.ocupado 
+    
+    def get_numero(self) :
+        return self.numero 
 
 class Itinerario:
     def __init__(self, origen, destino, paradas = []):
@@ -100,7 +111,7 @@ class MedioPago (ABC):
     #Clase interfaz no lleva init (en ese caso definiria comportamiento en una clase abstracta)
     
     @abstractmethod   
-    def procesar_pago(self, monto : int): #procesa el pago acorde a cada metodo simulado
+    def procesar_pago(self, monto : float): #procesa el pago acorde a cada metodo simulado
         pass
     
     @abstractmethod
@@ -109,28 +120,52 @@ class MedioPago (ABC):
     
     #se pueden seguir agregando metodos abstractos, siempre y cuando los usen todos los servicios. Los servicios no deberian tener metodos que no esten especificados en esta interfaz
      
-#"Las ventas implican la validación de un medio de pago a traves de un servicio externo simulado". Simulamos el servicio de cada uno? o lo dejamos abstracto?
 class MercadoPago(MedioPago):
     def __init__(self, celular, email):
         self.celular = celular
         self.email = email
         
-    def procesar_pago(self, monto):
-        ...
+    def procesar_pago(self, monto : float):
+        print(f"[MERCADO PAGO] Enviando solicitud de pago de ${monto:.2f} " )
+        
+        transaccion_id = f"MP-{int(datetime.datetime.now().timestamp())}"
+        print(f"Link de pago: https://mpago.la/{transaccion_id[-6:]}")
+        print("Esperando confirmación del usuario...")
+        print("Pago recibido exitosamente.")
+        
     
     def enviar_comprobante(self):
-        ...
+        comprobante = (
+            f"[MERCADO PAGO] Enviando comprobante al correo {self.email}..."
+            f"----- COMPROBANTE DE PAGO -----"
+            f"Fecha: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M')}"
+            f"Cuenta asociada: {self.celular}"
+            f"-------------------------------"
+        )
+        print(comprobante)
 
 class Uala(MedioPago):
     def __init__(self, email, nombre_titular):
         self.email = email
         self.nombre_titular = nombre_titular
         
-    def procesar_pago(self, monto):
-        ...
+    def procesar_pago(self, monto : float ):
+        print(f"[UALÁ] Enviando solicitud de pago de ${monto:.2f} " )
+        
+        transaccion_id = f"UA-{int(datetime.datetime.now().timestamp())}"
+        print(f"Código de pago generado: {transaccion_id[-6:]}")
+        print("Esperando confirmación del usuario...")
+        print("Pago recibido exitosamente.")
     
     def enviar_comprobante(self):
-        ...    
+        comprobante = (
+            f"[UALÁ] Enviando comprobante al correo {self.email}..."
+            f"----- COMPROBANTE DE PAGO -----"
+            f"Fecha: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M')}"
+            f"Usuario asociado: {self.nombre_titular}"
+            f"-------------------------------"
+        )
+        print(comprobante)    
 
 class TarjetaCredito(MedioPago):
     def __init__(self, numero, DNITitular, nombre, fecha_vencimiento):
@@ -139,11 +174,27 @@ class TarjetaCredito(MedioPago):
         self.nombre = nombre
         self.fecha_vencimiento = fecha_vencimiento
     
-    def procesar_pago(self, monto):
-        ...
+    def procesar_pago(self, monto : float ):
+        print(f"Procesando pago de ${monto:.2f} con tarjeta de crédito.")
+        
+        if(self.fecha_vencimiento < datetime.datetime.today()):
+            print(f"Pago autorizado por ${monto:.2f}.")
+        else:
+            print("Error: Pago no autorizado. La tarjeta esta vencida")
+            
     
-    def enviar_comprobante(self): #enviarlo a la pagina del banco? que el usuario lo vea en homebanking 
-        ...
+    def enviar_comprobante(self):  
+        
+        ultimos_digitos = str(self.numero)[-4:]
+        comprobante = (
+            f"COMPROBANTE DE PAGO\n"
+            f"---------------------\n"
+            f"Tarjeta: **** **** **** {ultimos_digitos}\n"
+            f"Fecha: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M')}\n"
+            f"Monto: CONFIRMADO\n"
+            f"Comprobante enviado al HomeBanking asociado a esta tarjeta.\n"
+        )
+        print(comprobante)
     
 
 if __name__ == "__main__":
@@ -174,10 +225,23 @@ if __name__ == "__main__":
         print("Servicio ",counter,":")
         print(s.mostrar_infoservicio())
         counter+= 1
-
-    servicio_seleccionado = int(input("¿Qué servicio desea seleccionar?"))-1
-    print("Asientos disponibles: [", end= "")
-    servicios[servicio_seleccionado].unidad.mostrar_asientos(False)
+        
+    servicio_seleccionado = int(input("¿Qué servicio desea seleccionar?")) #index arranca en 0, servicios disponibles 
+    
+    
+    unidad = servicios[servicio_seleccionado].unidad
+    asientos_libres = unidad.asientos_disponibles()
+    
+    
+    if len(asientos_libres) > 0 :  #sin terminar, mientras no modelemos comportamiento de la clase y sea solo para instanciar y mostrar esta bien que trabajemos en el main (checkear asientos libres debe ser metodo)
+        print("Asientos libres: ")
+        for a in asientos_libres:
+            print(a)
+        print(" ]")
+        numero_asiento = int(input("¿Qué asiento desea seleccionar?"))     
+    else: 
+        print("No hay asientos disponibles en este servicio")
+        
     print("]")
 
     # Se pide al usuario el asiento que quiere reservar de los disponibles
