@@ -44,7 +44,7 @@ class Reserva:
         return(
             f"Reserva realizada: \n"
             f"Pasajero {self.pasajero.nombre}, " 
-            f"Asiento {self.asiento.numero}, "
+            f"Asiento {self.asiento.numero + 1}, "
             f"servicio del {self.fecha_hora.day}/{self.fecha_hora.month}/{self.fecha_hora.year}"
         )
 
@@ -55,10 +55,11 @@ class Unidad:
         for x in range(5):
             self.asientos.append(Asiento(x+1,False)) #x+1 para que la lista de asientos no arranque de 0 (muero croto)
             
-    def mostrar_asientos(self):
+    def mostrar_asientos(self, estado:bool): # Booleano para determinar si mostrar asientos ocupados o libres
         for a in self.asientos:
-            print(a.numero, end = ", ")
-            
+            if a.ocupado == estado:
+                print(a.numero, end = ", ")
+    
         
         
 
@@ -174,21 +175,26 @@ if __name__ == "__main__":
         print(s.mostrar_infoservicio())
         counter+= 1
 
-    servicio_seleccionado = int(input("¿Qué servicio desea seleccionar?")) 
+    servicio_seleccionado = int(input("¿Qué servicio desea seleccionar?"))-1
     print("Asientos disponibles: [", end= "")
-    servicios[servicio_seleccionado].unidad.mostrar_asientos()
+    servicios[servicio_seleccionado].unidad.mostrar_asientos(False)
     print("]")
 
-    asiento_seleccionado = int(input("Que asiento desea reservar? "))
-    if servicios[servicio_seleccionado].unidad.asientos[asiento_seleccionado].ocupado == False: # 
-        servicios[servicio_seleccionado].unidad.asientos[asiento_seleccionado].ocupado == True
+    # Se pide al usuario el asiento que quiere reservar de los disponibles
+    asiento_seleccionado = int(input("Que asiento desea reservar? "))-1
+    if servicios[servicio_seleccionado].unidad.asientos[asiento_seleccionado].ocupado == False: 
+        servicios[servicio_seleccionado].unidad.asientos[asiento_seleccionado].ocupado = True   # El asiento del cole pasa a estar ocupado
         asiento1 = Asiento(asiento_seleccionado, True)
         reserva1 = Reserva(pasajero1,servicios[servicio_seleccionado].fecha_partida,asiento1)
         print(reserva1.MostrarReserva())
     else:
         print("El asiento que elegiste no esta disponible")
     
-    # Falta agregar caso en los que el asiento no exista en la unidad
+    # Mensaje despues de haber hecho la reserva
+    print("Asientos libres: ", end="")
+    servicios[servicio_seleccionado].unidad.mostrar_asientos(False)
+    print("/ Ocupados: ", end="")
+    servicios[servicio_seleccionado].unidad.mostrar_asientos(True)
     
     
 #para hacer un commit:
