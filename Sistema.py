@@ -55,13 +55,10 @@ class Unidad:
         for x in range(5):
             self.asientos.append(Asiento(x+1,False)) #x+1 para que la lista de asientos no arranque de 0 
             
-    def asientos_disponibles(self): 
-        L = []
+    def mostrar_asientos(self, estado:bool): # Booleano para determinar si mostrar asientos ocupados o libres
         for a in self.asientos:
-            if not a.is_ocupado() :
-                L.append(a.get_numero())
-    
-        return L
+            if a.ocupado == estado:
+                 print(a.numero, end = ", ")
     
                 
                 
@@ -226,22 +223,9 @@ if __name__ == "__main__":
         print(s.mostrar_infoservicio())
         counter+= 1
         
-    servicio_seleccionado = int(input("¿Qué servicio desea seleccionar?")) #index arranca en 0, servicios disponibles 
-    
-    
-    unidad = servicios[servicio_seleccionado].unidad
-    asientos_libres = unidad.asientos_disponibles()
-    
-    
-    if len(asientos_libres) > 0 :  #sin terminar, mientras no modelemos comportamiento de la clase y sea solo para instanciar y mostrar esta bien que trabajemos en el main (checkear asientos libres debe ser metodo)
-        print("Asientos libres: ")
-        for a in asientos_libres:
-            print(a)
-        print(" ]")
-        numero_asiento = int(input("¿Qué asiento desea seleccionar?"))     
-    else: 
-        print("No hay asientos disponibles en este servicio")
-        
+    servicio_seleccionado = int(input("¿Qué servicio desea seleccionar?"))-1
+    print("Asientos disponibles: [", end= "")
+    servicios[servicio_seleccionado].unidad.mostrar_asientos(False)    
     print("]")
 
     # Se pide al usuario el asiento que quiere reservar de los disponibles
