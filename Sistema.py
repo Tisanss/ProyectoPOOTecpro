@@ -54,7 +54,7 @@ class Reserva:
         return(
             f"Reserva realizada: \n"
             f"Pasajero {self.pasajero.nombre}, " 
-            f"Asiento {self.asiento.numero}, "
+            f"Asiento {self.asiento.numero + 1}, "
             f"servicio del {self.fecha_hora.day}/{self.fecha_hora.month}/{self.fecha_hora.year}"
         )
 
@@ -63,9 +63,9 @@ class Unidad:
         self.patente = patente
         self.asientos = []
         for x in range(5):
-            self.asientos.append(Asiento(x+1,False)) #x+1 para que la lista de asientos no arranque de 0 (muero croto)
+            self.asientos.append(Asiento(x+1,False)) #x+1 para que la lista de asientos no arranque de 0 
             
-    def mostrar_asientos(self):
+    def mostrar_asientos(self, estado:bool): # Booleano para determinar si mostrar asientos ocupados o libres
         for a in self.asientos:
             print(a.numero, end = ", ")
     def get_patente(self):
@@ -77,6 +77,12 @@ class Asiento:
     def __init__(self, numero, ocupado):
         self.numero = numero 
         self.ocupado = ocupado
+        
+    def is_ocupado(self) -> bool :
+        return self.ocupado 
+    
+    def get_numero(self) :
+        return self.numero 
 
 class Itinerario:
     def __init__(self, origen, destino, paradas = []):
@@ -104,13 +110,13 @@ class Ciudad:
         self.nombre = nombre 
         self.provincia = provincia
         
-        
+
 #Una interfez, X metodos, redefine, los usan las clases hijas
 class MedioPago (ABC):
     #Clase interfaz no lleva init (en ese caso definiria comportamiento en una clase abstracta)
     
     @abstractmethod   
-    def procesar_pago(self, monto : int): #procesa el pago acorde a cada metodo simulado
+    def procesar_pago(self, monto : float): #procesa el pago acorde a cada metodo simulado
         pass
     
     @abstractmethod
@@ -119,28 +125,52 @@ class MedioPago (ABC):
     
     #se pueden seguir agregando metodos abstractos, siempre y cuando los usen todos los servicios. Los servicios no deberian tener metodos que no esten especificados en esta interfaz
      
-#"Las ventas implican la validación de un medio de pago a traves de un servicio externo simulado". Simulamos el servicio de cada uno? o lo dejamos abstracto?
 class MercadoPago(MedioPago):
     def __init__(self, celular, email):
         self.celular = celular
         self.email = email
         
-    def procesar_pago(self, monto):
-        ...
+    def procesar_pago(self, monto : float):
+        print(f"[MERCADO PAGO] Enviando solicitud de pago de ${monto:.2f} " )
+        
+        transaccion_id = f"MP-{int(datetime.datetime.now().timestamp())}"
+        print(f"Link de pago: https://mpago.la/{transaccion_id[-6:]}")
+        print("Esperando confirmación del usuario...")
+        print("Pago recibido exitosamente.")
+        
     
     def enviar_comprobante(self):
-        ...
+        comprobante = (
+            f"[MERCADO PAGO] Enviando comprobante al correo {self.email}...\n"
+            f"----- COMPROBANTE DE PAGO -----\n"
+            f"Fecha: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M')}\n"
+            f"Cuenta asociada: {self.celular}\n"
+            f"-------------------------------\n"
+        )
+        print(comprobante)
 
 class Uala(MedioPago):
     def __init__(self, email, nombre_titular):
         self.email = email
         self.nombre_titular = nombre_titular
         
-    def procesar_pago(self, monto):
-        ...
+    def procesar_pago(self, monto : float ):
+        print(f"[UALÁ] Enviando solicitud de pago de ${monto:.2f} " )
+        
+        transaccion_id = f"UA-{int(datetime.datetime.now().timestamp())}"
+        print(f"Código de pago generado: {transaccion_id[-6:]}")
+        print("Esperando confirmación del usuario...")
+        print("Pago recibido exitosamente.")
     
     def enviar_comprobante(self):
-        ...    
+        comprobante = (
+            f"[UALÁ] Enviando comprobante al correo {self.email}...\n"
+            f"----- COMPROBANTE DE PAGO -----\n"
+            f"Fecha: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M')}\n"
+            f"Usuario asociado: {self.nombre_titular}\n"
+            f"-------------------------------\n"
+        )
+        print(comprobante)    
 
 class TarjetaCredito(MedioPago):
     def __init__(self, numero, DNITitular, nombre, fecha_vencimiento):
@@ -149,23 +179,57 @@ class TarjetaCredito(MedioPago):
         self.nombre = nombre
         self.fecha_vencimiento = fecha_vencimiento
     
-    def procesar_pago(self, monto):
-        ...
+    def procesar_pago(self, monto : float ):
+        print(f"Procesando pago de ${monto:.2f} con tarjeta de crédito.")
+        
+        if(self.fecha_vencimiento < datetime.datetime.today()):
+            print(f"Pago autorizado por ${monto:.2f}.")
+        else:
+            print("Error: Pago no autorizado. La tarjeta esta vencida")
+            
     
-    def enviar_comprobante(self): #enviarlo a la pagina del banco? que el usuario lo vea en homebanking 
-        ...
+    def enviar_comprobante(self):  
+        
+        ultimos_digitos = str(self.numero)[-4:]
+        comprobante = (
+            f"COMPROBANTE DE PAGO\n"
+            f"---------------------\n"
+            f"Tarjeta: **** **** **** {ultimos_digitos}\n"
+            f"Fecha: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M')}\n"
+            f"Usuario Asociado: {self.nombre}, DNI: {self.DNITitular}"
+            f"Comprobante enviado al HomeBanking asociado a esta tarjeta.\n"
+        )
+        print(comprobante)
+#clase que realiza la cobranza del pago usando un merdio de pago
+class Pago():
+    def __init__(self,medio_pago:MedioPago,monto):
+        self.medio=medio_pago
+        self.monto=monto
+    def cobrar(self):
+        self.medio.procesar_pago(self.monto)
+    def get_monto(self):
+        return self.monto
+
 class informe:
     #informe de los servicios en un periodo de tiempo
-    def __init__(self,servicios:list[Servicio],fecha_desde:datetime.date, fecha_hasta:datetime.date):
+    def __init__(self,servicios:list[Servicio],pagos:list[Pago],fecha_desde:datetime.date, fecha_hasta:datetime.date):
         self.desde=fecha_desde
         self.hasta=fecha_hasta
         self.servicios:list[Servicio]=servicios
+        self.pagos:list[Pago]=pagos
+        self.total_faccturado=0
+        self.canti_pagos=0
+    #mostrar informe tambien cuenta el total facturado
     def mostrar_informe(self):
         for serv in self.servicios:
             serv.mostrar_infoservicio_fecha(self.desde,self.hasta)
-        #total facturado
-        # cantidad de pagos realizados
-        # #
+        print(f"Detalle de pagos:")
+        for pag in self.pagos:
+            self.canti_pagos+=1
+            self.total_faccturado+=pag.get_monto()
+            print(f"Monto pagado de:{pag.get_monto()}")
+        
+        print(f"Monto tolal de {self.canti_pagos} pagos: {self.total_faccturado} ")
 
         
 
@@ -197,32 +261,41 @@ if __name__ == "__main__":
         print("Servicio ",counter,":")
         print(s.mostrar_infoservicio())
         counter+= 1
-
-    servicio_seleccionado = int(input("¿Qué servicio desea seleccionar?")) 
+        
+    servicio_seleccionado = int(input("¿Qué servicio desea seleccionar?"))-1
     print("Asientos disponibles: [", end= "")
-    servicios[servicio_seleccionado].unidad.mostrar_asientos()
+    servicios[servicio_seleccionado].unidad.mostrar_asientos(False)    
     print("]")
 
-    asiento_seleccionado = int(input("Que asiento desea reservar? "))
-    if servicios[servicio_seleccionado].unidad.asientos[asiento_seleccionado].ocupado == False: # 
-        servicios[servicio_seleccionado].unidad.asientos[asiento_seleccionado].ocupado == True
+    # Se pide al usuario el asiento que quiere reservar de los disponibles
+    asiento_seleccionado = int(input("Que asiento desea reservar? "))-1
+    if servicios[servicio_seleccionado].unidad.asientos[asiento_seleccionado].ocupado == False: 
+        servicios[servicio_seleccionado].unidad.asientos[asiento_seleccionado].ocupado = True   # El asiento del cole pasa a estar ocupado
         asiento1 = Asiento(asiento_seleccionado, True)
         reserva1 = Reserva(pasajero1,servicios[servicio_seleccionado].fecha_partida,asiento1)
         print(reserva1.MostrarReserva())
     else:
         print("El asiento que elegiste no esta disponible")
     
+    #Realizacion del pago (cliente ingresa datos de su medio de pago)
+    # implementar elección de metodo de pago#
+    pago1=Pago(mercadopago1,9999)
+    pago2=Pago(tarjetacredito1,9999)
 
+    pagos=(pago1,pago2)
+    # Mensaje despues de haber hecho la reserva
+    print("Asientos libres: ", end="")
+    servicios[servicio_seleccionado].unidad.mostrar_asientos(False)
+    print("/ Ocupados: ", end="")
+    servicios[servicio_seleccionado].unidad.mostrar_asientos(True)
+    
     r_info_usuario=input("Mostrar informe de servicios?(y/n):")
 
     if r_info_usuario =='y':
         print("Mostrando datos:")
-        servicios_loc= (servicio1,servicio2)    
-        informe_loc=informe(servicios_loc,datetime.date(2020,1,1),datetime.date(2025,12,31))
+           
+        informe_loc=informe(servicios,pagos,datetime.date(2020,1,1),datetime.date(2025,12,31))
         informe_loc.mostrar_informe()
-
-    # Falta agregar caso en los que el asiento no exista en la unidad
-    
     
 #para hacer un commit:
 # guardalo
