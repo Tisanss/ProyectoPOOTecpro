@@ -133,11 +133,11 @@ class MercadoPago(MedioPago):
     
     def enviar_comprobante(self):
         comprobante = (
-            f"[MERCADO PAGO] Enviando comprobante al correo {self.email}..."
-            f"----- COMPROBANTE DE PAGO -----"
-            f"Fecha: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M')}"
-            f"Cuenta asociada: {self.celular}"
-            f"-------------------------------"
+            f"[MERCADO PAGO] Enviando comprobante al correo {self.email}...\n"
+            f"----- COMPROBANTE DE PAGO -----\n"
+            f"Fecha: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M')}\n"
+            f"Cuenta asociada: {self.celular}\n"
+            f"-------------------------------\n"
         )
         print(comprobante)
 
@@ -156,11 +156,11 @@ class Uala(MedioPago):
     
     def enviar_comprobante(self):
         comprobante = (
-            f"[UALÁ] Enviando comprobante al correo {self.email}..."
-            f"----- COMPROBANTE DE PAGO -----"
-            f"Fecha: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M')}"
-            f"Usuario asociado: {self.nombre_titular}"
-            f"-------------------------------"
+            f"[UALÁ] Enviando comprobante al correo {self.email}...\n"
+            f"----- COMPROBANTE DE PAGO -----\n"
+            f"Fecha: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M')}\n"
+            f"Usuario asociado: {self.nombre_titular}\n"
+            f"-------------------------------\n"
         )
         print(comprobante)    
 
@@ -188,7 +188,7 @@ class TarjetaCredito(MedioPago):
             f"---------------------\n"
             f"Tarjeta: **** **** **** {ultimos_digitos}\n"
             f"Fecha: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M')}\n"
-            f"Monto: CONFIRMADO\n"
+            f"Usuario Asociado: {self.nombre}, DNI: {self.DNITitular}"
             f"Comprobante enviado al HomeBanking asociado a esta tarjeta.\n"
         )
         print(comprobante)
