@@ -15,13 +15,13 @@ class Servicio:
         self.precio = precio
         self.itinerario = itinerario
     def mostrar_infoservicio(self):
-        return{
+        return(
             f"{self.itinerario.mostrar_itinerario()}\n"
             f"Calidad: {self.calidad}, "
             f"Salida: {self.fecha_partida},"
             f"Llegada: {self.fecha_llegada},"
             f"Precio: ${self.precio}"
-        }
+        )
 
 
 class Venta:
@@ -40,6 +40,14 @@ class Reserva:
         self.fecha_hora = fecha_hora
         self.asiento = asiento
 
+    def MostrarReserva(self):
+        return(
+            f"Reserva realizada: \n"
+            f"Pasajero {self.pasajero.nombre}, " 
+            f"Asiento {self.asiento.numero}, "
+            f"servicio del {self.fecha_hora.day}/{self.fecha_hora.month}/{self.fecha_hora.year}"
+        )
+
 class Unidad:
     def __init__(self, patente):
         self.patente = patente
@@ -49,7 +57,7 @@ class Unidad:
             
     def mostrar_asientos(self):
         for a in self.asientos:
-            print(a.numero," ")
+            print(a.numero, end = ", ")
             
         
         
@@ -142,9 +150,7 @@ if __name__ == "__main__":
     argentour1 = ArgenTour(True)
     venta1 = Venta(datetime.time(14,30,00))
     
-    pasajero1 = Pasajero("Martin","martinelmascrack777@gmail.com",36566999)
-    reserva1 = Reserva(pasajero1,datetime.time(15,45,00),44)
-    asiento1 = Asiento(44,True)
+    pasajero1 = Pasajero("Martin Perez","martinelmascrack777@gmail.com",36566999)
     #falta declarar itinerario
     ciudad1 = Ciudad("3100","Parana","Entre rios")
     #falta declarar medio_pago
@@ -157,8 +163,8 @@ if __name__ == "__main__":
 
     itinerario1 = Itinerario(ciudad_origen,ciudad_destino, [ciudad_parada])
     unidad1 = Unidad("123 ABC")
-    servicio1 = Servicio(unidad1,datetime.date(2025,5,6),datetime.date(2025,6,3),"Premium",50000,itinerario1)
-    servicio2 = Servicio(unidad1, datetime.date(2025,5,10),datetime.date(2025,5,11),"Comun",40000,itinerario1)
+    servicio1 = Servicio(unidad1,datetime.date(2025,5,6),datetime.date(2025,6,3),"Ejecutivo",50000,itinerario1)
+    servicio2 = Servicio(unidad1, datetime.date(2025,5,10),datetime.date(2025,5,11),"Comun",20000,itinerario1)
     servicios = [servicio1, servicio2]
     
     print("Servicios disponibles: ")
@@ -167,12 +173,22 @@ if __name__ == "__main__":
         print("Servicio ",counter,":")
         print(s.mostrar_infoservicio())
         counter+= 1
-        
+
     servicio_seleccionado = int(input("¿Qué servicio desea seleccionar?")) 
-    print("Asientos disponibles: [")
+    print("Asientos disponibles: [", end= "")
     servicios[servicio_seleccionado].unidad.mostrar_asientos()
     print("]")
+
+    asiento_seleccionado = int(input("Que asiento desea reservar? "))
+    if servicios[servicio_seleccionado].unidad.asientos[asiento_seleccionado].ocupado == False: # 
+        servicios[servicio_seleccionado].unidad.asientos[asiento_seleccionado].ocupado == True
+        asiento1 = Asiento(asiento_seleccionado, True)
+        reserva1 = Reserva(pasajero1,servicios[servicio_seleccionado].fecha_partida,asiento1)
+        print(reserva1.MostrarReserva())
+    else:
+        print("El asiento que elegiste no esta disponible")
     
+    # Falta agregar caso en los que el asiento no exista en la unidad
     
     
 #para hacer un commit:
@@ -186,4 +202,4 @@ if __name__ == "__main__":
 # git stash
 # git pull
 # git stash pop 
-        
+
