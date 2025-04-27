@@ -159,8 +159,8 @@ class TarjetaCredito(MedioPago):
     def __init__(self, numero, DNITitular, nombre, fecha_vencimiento):
         self.nombre = nombre
         self.fecha_vencimiento = fecha_vencimiento
-        self.numero =numero
-        self.DNITitular =DNITitular
+        self.numero = numero
+        self.DNITitular = DNITitular
     
     def procesar_pago(self, monto : float ):
          print(f"Procesando pago de ${monto:.2f} con tarjeta de crédito.")
@@ -191,6 +191,7 @@ class Venta:
         self.monto = monto
         self.reserva = reserva
         self.fecha_hora = fecha_hora
+        
 
     def cobrar(self):
         self.medio.procesar_pago(self.monto)
@@ -203,23 +204,31 @@ class Venta:
         return self.medio.__class__.__name__
 
 class Informe:
-    def init(self,servicios:list[Servicio],ventas:list[Venta],fecha_desde:datetime.datetime, fecha_hasta:datetime.datetime):
+    def __init__(self,servicios:list[Servicio],ventas:list[Venta],fecha_desde:datetime.datetime, fecha_hasta:datetime.datetime):
         self.desde=fecha_desde
         self.hasta=fecha_hasta
         self.servicios:list[Servicio]=servicios
         self.ventas:list[Venta]=ventas
-        self.total_faccturado=0
-        self.canti_ventas=0
+        self.total_facturado=0
+        self.cant_pagos=0
+        self.counter_metodos = {"MercadoPago": 0, "Uala": 0, "TarjetaCredito": 0}
 
     def mostrar_informe(self):
         for serv in self.servicios:
             serv.mostrar_infoservicio_fecha(self.desde, self.hasta)
         print("Detalle de pagos:")
+        
         for pag in self.ventas:
-            self.canti_ventas += 1
-            self.total_faccturado += pag.get_monto()
+            self.cant_pagos += 1
+            self.total_facturado += pag.get_monto()
             print(f"Monto pagado: {pag.get_monto()} con {pag.get_metodo()}")
-        print(f"Monto total de {self.canti_ventas} pagos: {self.total_faccturado}")
+            self.counter_metodos[pag.get_metodo()] +=1
+            
+        print(f"Monto total de {self.cant_pagos} pagos: {self.total_facturado}")
+        print(f"Pagos con Mercado Pago: {self.counter_metodos["MercadoPago"]}")
+        print(f"Pagos con Ualá: {self.counter_metodos["Uala"]}")
+        print(f"Pagos con Tarjeta de credito: {self.counter_metodos["TarjetaCredito"]}")
+        
 
 if __name__ == "__main__":
     argentour1 = ArgenTour(True)
@@ -268,8 +277,7 @@ if __name__ == "__main__":
         # Preguntar si se paga la reserva
         pagar = input("¿Desea pagar ahora? (y/n): ").lower()
         if pagar == 'y':
-            print("===¿Qué metodo de pago desea seleccionar?=== \n==>1: Mercado Pago \n==>2: Ualá \n==>3: Tarjeta de credito\n")
-            opcion = int(input())
+            opcion = int(input("¿Qué metodo de pago desea seleccionar? 1: Mercado Pago, 2: Ualá, 3: Tarjeta de credito"))
 
             metodo = None
             match opcion:
@@ -284,6 +292,8 @@ if __name__ == "__main__":
 
             total_a_abonar = servicios[servicio_seleccionado].precio
             metodo.procesar_pago(total_a_abonar)
+            now = datetime.datetime.today()
+            venta1 = Venta(metodo, total_a_abonar, reserva,datetime.datetime.now())
             venta1=Venta(metodo,total_a_abonar,total_a_abonar,datetime.datetime.today())
             metodo.enviar_comprobante()
 
@@ -308,7 +318,7 @@ if __name__ == "__main__":
     if r_info_usuario =='y':
         print("Mostrando datos:")
            
-        informe_loc=Informe(servicios,ventas,datetime.date(2020,1,1),datetime.date(2025,12,31))
+        informe_loc=Informe(servicios,ventas,datetime.datetime(2020,1,1),datetime.datetime(2025,12,31))
         informe_loc.mostrar_informe()
     
 #para hacer un commit:
