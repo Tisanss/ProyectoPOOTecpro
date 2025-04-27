@@ -163,23 +163,24 @@ class TarjetaCredito(MedioPago):
     def procesar_pago(self, monto : float ):
          print(f"Procesando pago de ${monto:.2f} con tarjeta de crédito.")
          
-         if(self.fecha_vencimiento < datetime.datetime.today()):
+         if(self.fecha_vencimiento > datetime.datetime.today()):
              print(f"Pago autorizado por ${monto:.2f}.")
          else:
              print("Error: Pago no autorizado. La tarjeta esta vencida")
 
     def enviar_comprobante(self):  
-         
-         ultimos_digitos = str(self.numero)[-4:]
-         comprobante = (
+        if(self.fecha_vencimiento > datetime.datetime.today()):
+            ultimos_digitos = str(self.numero)[-4:]
+            comprobante = (
              f"COMPROBANTE DE PAGO\n"
              f"---------------------\n"
              f"Tarjeta: **** **** **** {ultimos_digitos}\n"
              f"Fecha: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M')}\n"
              f"Usuario Asociado: {self.nombre}, DNI: {self.DNITitular}"
              f"Comprobante enviado al HomeBanking asociado a esta tarjeta.\n"
-         )
-         print(comprobante)
+            )
+            print(comprobante)
+         
     
         
 class Venta:
@@ -196,15 +197,17 @@ class Venta:
 
     def get_monto(self):
         return self.monto
+    def get_metodo(self):
+        return self.medio.__class__.__name__
 
 class Informe:
-    def __init__(self, servicios, pagos, fecha_desde, fecha_hasta):
-        self.desde = fecha_desde
-        self.hasta = fecha_hasta
-        self.servicios = servicios
-        self.pagos = pagos
-        self.total_facturado = 0
-        self.cant_pagos = 0
+    def init(self,servicios:list[Servicio],ventas:list[Venta],fecha_desde:datetime.date, fecha_hasta:datetime.date):
+        self.desde=fecha_desde
+        self.hasta=fecha_hasta
+        self.servicios:list[Servicio]=servicios
+        self.ventas:list[Venta]=ventas
+        self.total_faccturado=0
+        self.canti_ventas=0
 
     def mostrar_informe(self):
         for serv in self.servicios:
@@ -213,7 +216,7 @@ class Informe:
         for pag in self.pagos:
             self.cant_pagos += 1
             self.total_facturado += pag.get_monto()
-            print(f"Monto pagado: {pag.get_monto()}")
+            print(f"Monto pagado: {pag.get_monto()} con {pag.get_metodo()}")
         print(f"Monto total de {self.cant_pagos} pagos: {self.total_facturado}")
 
 if __name__ == "__main__":
@@ -229,6 +232,12 @@ if __name__ == "__main__":
 
     servicio1 = Servicio(unidad1, datetime.datetime(2025, 5, 6, 10, 0), datetime.datetime(2025, 5, 6, 18, 0), "Ejecutivo", 50000, itinerario1)
     servicios = [servicio1]
+
+    uala1 = Uala("martinelmascrack777@gmail.com","Martin Perez")
+    mercadopago1 = MercadoPago(3435557777,"email@gmail.com")
+    tarjetacredito1 = TarjetaCredito(2505541254125632, 44777555, "Nombre", 2026)
+
+    ventas = []
 
     print("Servicios disponibles:")
     for i, s in enumerate(servicios, 1):
@@ -251,25 +260,34 @@ if __name__ == "__main__":
         # Preguntar si se paga la reserva
         pagar = input("¿Desea pagar ahora? (y/n): ").lower()
         if pagar == 'y':
-            mp = MercadoPago("44542631", pasajero1.email)
-            pago = Pago(mp, servicio.precio, reserva)
-            pago.cobrar()
+            opcion = int(input("¿Qué metodo de pago desea seleccionar? 1: Mercado Pago, 2: Ualá, 3: Tarjeta de credito"))
+
+            metodo = None
+            match opcion:
+                case 1:
+                    metodo = mercadopago1
+                case 2:
+                    metodo = uala1
+                case 3:
+                    metodo = tarjetacredito1
+                case _:
+                    print("Opción inválida")
+
+            total_a_abonar = servicios[servicio_seleccionado].precio
+            metodo.procesar_pago(total_a_abonar)
+            venta1=Venta(datetime.datetime.today(),metodo,total_a_abonar)
+            metodo.enviar_comprobante()
+
+            ventas.append(venta1)
         else:
             print("No se pagó la reserva aún. Se mantendrá hasta 30 minutos antes de la salida.")
+
 
         # Simular vencimiento:
         reserva.caducar_reserva()
     else:
         print("Asiento no disponible.")
 
-    mercadopago1 = MercadoPago(3435557777,"email@gmail.com")
-    tarjetacredito1 = TarjetaCredito(2505541254125632, 44777555, "Nombre", 2026)
-    #Realizacion del pago (cliente ingresa datos de su medio de pago)
-    # implementar elección de metodo de pago#
-    pago1=Venta(mercadopago1,9999)
-    pago2=Venta(tarjetacredito1,9999)
-
-    pagos=(pago1,pago2)
     # Mensaje despues de haber hecho la reserva
     print("Asientos libres: ", end="")
     servicios[servicio_seleccionado].unidad.mostrar_asientos(False)
@@ -281,7 +299,7 @@ if __name__ == "__main__":
     if r_info_usuario =='y':
         print("Mostrando datos:")
            
-        informe_loc=Informe(servicios,pagos,datetime.date(2020,1,1),datetime.date(2025,12,31))
+        informe_loc=Informe(servicios,ventas,datetime.date(2020,1,1),datetime.date(2025,12,31))
         informe_loc.mostrar_informe()
     
 #para hacer un commit:
