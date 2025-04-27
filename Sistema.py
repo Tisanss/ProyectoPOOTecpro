@@ -34,9 +34,7 @@ class Servicio:
         
 
 
-class Venta:
-    def __init__(self, fecha_hora):
-        self.fecha_hora = fecha_hora
+
 
 class Pasajero:
     def __init__(self, nombre, email, dni):
@@ -201,8 +199,9 @@ class TarjetaCredito(MedioPago):
         )
         print(comprobante)
 #clase que realiza la cobranza del pago usando un merdio de pago
-class Pago():
-    def __init__(self,medio_pago:MedioPago,monto):
+class Venta:
+    def __init__(self, fecha_hora:datetime.datetime,medio_pago:MedioPago,monto):
+        self.fecha_hora = fecha_hora
         self.medio=medio_pago
         self.monto=monto
     def cobrar(self):
@@ -210,33 +209,34 @@ class Pago():
     def get_monto(self):
         return self.monto
 
+
 class informe:
     #informe de los servicios en un periodo de tiempo
-    def __init__(self,servicios:list[Servicio],pagos:list[Pago],fecha_desde:datetime.date, fecha_hasta:datetime.date):
+    def __init__(self,servicios:list[Servicio],ventas:list[Venta],fecha_desde:datetime.date, fecha_hasta:datetime.date):
         self.desde=fecha_desde
         self.hasta=fecha_hasta
         self.servicios:list[Servicio]=servicios
-        self.pagos:list[Pago]=pagos
+        self.ventas:list[Venta]=ventas
         self.total_faccturado=0
-        self.canti_pagos=0
+        self.canti_ventas=0
     #mostrar informe tambien cuenta el total facturado
     def mostrar_informe(self):
         for serv in self.servicios:
             serv.mostrar_infoservicio_fecha(self.desde,self.hasta)
         print(f"Detalle de pagos:")
-        for pag in self.pagos:
-            self.canti_pagos+=1
+        for pag in self.ventas:
+            self.canti_ventas+=1
             self.total_faccturado+=pag.get_monto()
             print(f"Monto pagado de:{pag.get_monto()}")
         
-        print(f"Monto tolal de {self.canti_pagos} pagos: {self.total_faccturado} ")
+        print(f"Monto tolal de {self.canti_ventas} pagos: {self.total_faccturado} ")
 
         
 
 if __name__ == "__main__":
 
     argentour1 = ArgenTour(True)
-    venta1 = Venta(datetime.time(14,30,00))
+    
     
     pasajero1 = Pasajero("Martin Perez","martinelmascrack777@gmail.com",36566999)
     #falta declarar itinerario
@@ -279,10 +279,10 @@ if __name__ == "__main__":
     
     #Realizacion del pago (cliente ingresa datos de su medio de pago)
     # implementar elección de metodo de pago#
-    pago1=Pago(mercadopago1,9999)
-    pago2=Pago(tarjetacredito1,9999)
+    venta1=Venta(datetime.datetime(2025,1,30,16,30),mercadopago1,9999)
+    venta2=Venta(datetime.datetime(2025,2,10,10,00),tarjetacredito1,9999)
 
-    pagos=(pago1,pago2)
+    ventas=(venta1,venta2)
     # Mensaje despues de haber hecho la reserva
     print("Asientos libres: ", end="")
     servicios[servicio_seleccionado].unidad.mostrar_asientos(False)
@@ -294,7 +294,7 @@ if __name__ == "__main__":
     if r_info_usuario =='y':
         print("Mostrando datos:")
            
-        informe_loc=informe(servicios,pagos,datetime.date(2020,1,1),datetime.date(2025,12,31))
+        informe_loc=informe(servicios,ventas,datetime.date(2020,1,1),datetime.date(2025,12,31))
         informe_loc.mostrar_informe()
     
 #para hacer un commit:
