@@ -159,6 +159,8 @@ class TarjetaCredito(MedioPago):
     def __init__(self, numero, DNITitular, nombre, fecha_vencimiento):
         self.nombre = nombre
         self.fecha_vencimiento = fecha_vencimiento
+        self.numero =numero
+        self.DNITitular =DNITitular
     
     def procesar_pago(self, monto : float ):
          print(f"Procesando pago de ${monto:.2f} con tarjeta de crédito.")
@@ -213,11 +215,11 @@ class Informe:
         for serv in self.servicios:
             serv.mostrar_infoservicio_fecha(self.desde, self.hasta)
         print("Detalle de pagos:")
-        for pag in self.pagos:
-            self.cant_pagos += 1
-            self.total_facturado += pag.get_monto()
+        for pag in self.ventas:
+            self.canti_ventas += 1
+            self.total_faccturado += pag.get_monto()
             print(f"Monto pagado: {pag.get_monto()} con {pag.get_metodo()}")
-        print(f"Monto total de {self.cant_pagos} pagos: {self.total_facturado}")
+        print(f"Monto total de {self.canti_ventas} pagos: {self.total_faccturado}")
 
 if __name__ == "__main__":
     argentour1 = ArgenTour(True)
@@ -228,10 +230,16 @@ if __name__ == "__main__":
     ciudad_parada = Ciudad("3000", "Santa Fe", "Santa Fe")
 
     itinerario1 = Itinerario(ciudad_origen, ciudad_destino, [ciudad_parada])
+    itinerario2 = Itinerario(ciudad_origen, ciudad_destino, [ciudad_parada])
+    itinerario3 = Itinerario(ciudad_origen, ciudad_destino, [ciudad_parada])
     unidad1 = Unidad("123 ABC")
+    unidad2 = Unidad("456 EFG")
+    unidad3 = Unidad("789 HIJ")
 
     servicio1 = Servicio(unidad1, datetime.datetime(2025, 5, 6, 10, 0), datetime.datetime(2025, 5, 6, 18, 0), "Ejecutivo", 50000, itinerario1)
-    servicios = [servicio1]
+    servicio2 = Servicio(unidad2, datetime.datetime(2025, 8, 5, 11, 0), datetime.datetime(2025, 9, 6, 18, 0), "Turista", 30000, itinerario1)
+    servicio3 = Servicio(unidad3, datetime.datetime(2025, 11, 9, 12, 0), datetime.datetime(2025, 12, 6, 18, 0), "Ejecutivo", 60000, itinerario1)
+    servicios = [servicio1,servicio2,servicio3]
 
     uala1 = Uala("martinelmascrack777@gmail.com","Martin Perez")
     mercadopago1 = MercadoPago(3435557777,"email@gmail.com")
@@ -260,7 +268,8 @@ if __name__ == "__main__":
         # Preguntar si se paga la reserva
         pagar = input("¿Desea pagar ahora? (y/n): ").lower()
         if pagar == 'y':
-            opcion = int(input("¿Qué metodo de pago desea seleccionar? 1: Mercado Pago, 2: Ualá, 3: Tarjeta de credito"))
+            print("===¿Qué metodo de pago desea seleccionar?=== \n==>1: Mercado Pago \n==>2: Ualá \n==>3: Tarjeta de credito\n")
+            opcion = int(input())
 
             metodo = None
             match opcion:
@@ -275,7 +284,7 @@ if __name__ == "__main__":
 
             total_a_abonar = servicios[servicio_seleccionado].precio
             metodo.procesar_pago(total_a_abonar)
-            venta1=Venta(datetime.datetime.today(),metodo,total_a_abonar)
+            venta1=Venta(metodo,total_a_abonar,total_a_abonar,datetime.datetime.today())
             metodo.enviar_comprobante()
 
             ventas.append(venta1)
