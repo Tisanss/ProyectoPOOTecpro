@@ -35,10 +35,6 @@ class Servicio:
                 f"Precio: ${self.precio}"
             )
 
-class Venta:
-    def __init__(self, fecha_hora):
-        self.fecha_hora = fecha_hora
-
 class Pasajero:
     def __init__(self, nombre, email, dni):
         self.nombre = nombre
@@ -186,11 +182,12 @@ class TarjetaCredito(MedioPago):
          print(comprobante)
     
         
-class Pago:
-    def __init__(self, medio_pago: MedioPago, monto, reserva: Reserva):
+class Venta:
+    def __init__(self, medio_pago: MedioPago, monto, reserva: Reserva, fecha_hora):
         self.medio = medio_pago
         self.monto = monto
         self.reserva = reserva
+        self.fecha_hora = fecha_hora
 
     def cobrar(self):
         self.medio.procesar_pago(self.monto)
@@ -269,8 +266,8 @@ if __name__ == "__main__":
     tarjetacredito1 = TarjetaCredito(2505541254125632, 44777555, "Nombre", 2026)
     #Realizacion del pago (cliente ingresa datos de su medio de pago)
     # implementar elección de metodo de pago#
-    pago1=Pago(mercadopago1,9999)
-    pago2=Pago(tarjetacredito1,9999)
+    pago1=Venta(mercadopago1,9999)
+    pago2=Venta(tarjetacredito1,9999)
 
     pagos=(pago1,pago2)
     # Mensaje despues de haber hecho la reserva
@@ -284,7 +281,7 @@ if __name__ == "__main__":
     if r_info_usuario =='y':
         print("Mostrando datos:")
            
-        informe_loc=informe(servicios,pagos,datetime.date(2020,1,1),datetime.date(2025,12,31))
+        informe_loc=Informe(servicios,pagos,datetime.date(2020,1,1),datetime.date(2025,12,31))
         informe_loc.mostrar_informe()
     
 #para hacer un commit:
