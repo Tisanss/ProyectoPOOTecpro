@@ -159,6 +159,8 @@ class TarjetaCredito(MedioPago):
     def __init__(self, numero, DNITitular, nombre, fecha_vencimiento):
         self.nombre = nombre
         self.fecha_vencimiento = fecha_vencimiento
+        self.numero = numero
+        self.DNITitular = DNITitular
     
     def procesar_pago(self, monto : float ):
          print(f"Procesando pago de ${monto:.2f} con tarjeta de crédito.")
@@ -235,7 +237,7 @@ if __name__ == "__main__":
 
     uala1 = Uala("martinelmascrack777@gmail.com","Martin Perez")
     mercadopago1 = MercadoPago(3435557777,"email@gmail.com")
-    tarjetacredito1 = TarjetaCredito(2505541254125632, 44777555, "Nombre", 2026)
+    tarjetacredito1 = TarjetaCredito(2505541254125632, 44777555, "Nombre", datetime.datetime(2026,12,31))
 
     ventas = []
 
@@ -275,7 +277,8 @@ if __name__ == "__main__":
 
             total_a_abonar = servicios[servicio_seleccionado].precio
             metodo.procesar_pago(total_a_abonar)
-            venta1=Venta(datetime.datetime.today(),metodo,total_a_abonar)
+            now = datetime.datetime.today()
+            venta1 = Venta(now.date(), now, metodo, total_a_abonar)
             metodo.enviar_comprobante()
 
             ventas.append(venta1)
