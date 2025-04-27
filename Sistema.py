@@ -203,7 +203,7 @@ class Venta:
         return self.medio.__class__.__name__
 
 class Informe:
-    def init(self,servicios:list[Servicio],ventas:list[Venta],fecha_desde:datetime.date, fecha_hasta:datetime.date):
+    def init(self,servicios:list[Servicio],ventas:list[Venta],fecha_desde:datetime.datetime, fecha_hasta:datetime.datetime):
         self.desde=fecha_desde
         self.hasta=fecha_hasta
         self.servicios:list[Servicio]=servicios
@@ -243,7 +243,7 @@ if __name__ == "__main__":
 
     uala1 = Uala("martinelmascrack777@gmail.com","Martin Perez")
     mercadopago1 = MercadoPago(3435557777,"email@gmail.com")
-    tarjetacredito1 = TarjetaCredito(2505541254125632, 44777555, "Nombre", 2026)
+    tarjetacredito1 = TarjetaCredito(2505541254125632, 44777555, "Nombre", datetime.datetime(2026,12,31))
 
     ventas = []
 
